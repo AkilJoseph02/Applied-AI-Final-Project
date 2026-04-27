@@ -24,12 +24,23 @@ python src/main.py
 5. Wait a couple of seconds, implementing RAG for the similar genre/mood matches increased the runtime of the program (accessing the APIs, parsing the JSON, etc.)
 
 ## Sample Interactions: Include at least 2-3 examples of inputs and the resulting AI outputs to demonstrate the system is functional.
-
+1. Example 1: User likes country music, jolly mood, prefers songs with an energy of 0.8, likes acoustic songs, and wants 10 songs recommended to them.
+  Output:
+  ![alt text](image.png)
+  ![alt text](image-1.png)
+  ![alt text](image-2.png)
+2. Example 2: Users likes synth, sad music. Prefers low energy music with acoustics. Want 8 songs recommended to them.
+  Output:
+  ![alt text](image-3.png)
+  ![alt text](image-4.png)
+  ![alt text](image-5.png)
 
 ## Design Decisions: Why you built it this way, and what trade-offs you made.
+I figured that a main flaw of the show 3 project was that the genre and mood matches were HARD matches. It didn't matter if a genre was similar to another (folk is similar to country), or if a mood of music is outright synonymous to another (sad and moody music), the old recommender would only give points for EXACT matches, or none at all.
+
+One main tradeoff is the runtime of the program. After implementing RAG/calling the online API, the runtime increased from 2 seconds to several (around 15-20 seconds). And that's with 20 songs to score, if the songs.csv file contained more songs, likes in the hundreds, the runtime of the program would most likely suffer.
 
 ## Testing Summary: What worked, what didn't, and what you learned.
+All in all, implementing RAG was pretty painless, with some effort being put into the testing. I learned that AI opens the door to alot of improvement, but not without some compromises. For programs like this, optimization is a must.
 
 ## Reflection: What this project taught you about AI and problem-solving.
-
-## Link to Loom Presentation:
