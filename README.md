@@ -1,253 +1,35 @@
-# 🎵 Music Recommender Simulation
+## Title and Summary: What your project does and why it matters.
+Original Project is from Show 3: Music Recommender
 
-## Project Summary
+Original Purpose: Given a user profile that composed of a Favorite Genre, Favorite Mood, Target Energy, and if the user liked acoustics: the Music Recommender would the top 5 songs out of a catalog of songs (songs.csv) that would most likely appeal to the user by how close the song's aspects are to the user's preferences.
 
-In this project you will build and explain a small music recommender system.
+Updated Project: Uses a RAG implementation in the genre/mood matching part of the music recommendation system. Will either use the Datamuse online API thesaurus or a local fallback thesaurus (depends if the Datamuse API is unavailable) to determine if the mood or genre of a song in the catalogue is synonymous with the mood/genre the user prefers. If so, because the match isn't exactly accurate, the recommeder will give reduced points (+1.5 instead of +2.0 for genre, +0.8 instead of +1.0 for mood). Now allows the user to create their own profile for the recommender to work on.
 
-Your goal is to:
+## Architecture Overview: A short explanation of your system diagram.
+User gives their input in the terminal after executing Main.py (favorite genre/mood, if they like acoustics in their music, what's their preferred energy, how many songs they want recommended, etc). This input creates a profile for the user. Then, main.py loads up the catalogue located in data/songs.csv and calls on the recommendation function from the recommender.py file to score and rank each song up the number of song recommendations the user wants.
 
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
+With the update to the system using RAG, if the recommender notices that a song's genre or mood matches with the user's preference based on their profile, it will give the song a number of points, +2 for genre match, +1 for mood match. Songs will get points based on the difference between their energy and the target energy on the profile, and the amount/lack of acoustics depending on if the user likes acoustics.
 
-Replace this paragraph with your own summary of what your version does.
+RAG becomes a part of the equation if there isn't an exact match for genres or moods. If so, the recommender will either use an online API (Datamuse) thesaurus or a local fallback thesaurus to determine if the song's genre or mood are somewhat similiar to the user's preferences. RAG parses through the thesaurus and returns a list of synonyms for the user's preferred genre or mood, and if any of those synonyms are the song's mood or genre, then give the song a reduced number of points in the recommendation system (+1.5 points for similar genres, +0.8 points for similar moods). If not, the mood/genre don't match and no points will be given for mood/genre mismatch.
 
----
+After scoring every song within the songs.csv file, each with explanations for why they received/didn't receive points, rank them up to k places for the amount of song the user wanted recommended to them, highest to lowest.
 
-## How The System Works
-
-Explain your design in plain language.
-
-Some prompts to answer:
-
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
-
-The music recommender will focus on 3 main features: genre, mood, and energy. I feel like these three are the most quantifiable aspects of music that can be filtered and categorized/enumerated (genre: blues, jazz, pop, etc; mood: happy, sad, romantic, etc; energy: 0-100). 
-
-UserProfile will have the following the info: Name, List of Favorite Songs (used to determine or assume what genre/mood/energy the user likes most), Favorite Artist (suggest other artists and their songs to the user based on the Favorite Artist's genres), and Favorite Genre.
-
-Taste Profile: taste_profile = {"favorite_genre" = "Pop", "favorite_mood" = "chill", target_energy = 0.60, "likes_acoustic": true}
-
-Starting Recommendation Recipe:
-+2.0 points for genre match
-+1.0 point for mood match
-+(1.0 - abs(target_energy - song_energy) ) for energy match
-if "likes_acoustic" == true: +(song_acousticness), higher points if acoustics are high
-if "likes_acoustic" == false: +(1.0 - song_accousticness) higher points if acoustics are low
-
-FlowChart:
-flowchart TD
-    A[Input: User Prefs] --> B[Load CSV songs]
-    B --> C{More songs<br/>to process?}
-    C -->|Yes| D[Get next song]
-    D --> E[Calculate score<br/>using user prefs<br/>& scoring logic]
-    E --> F[Add to results]
-    F --> C
-    C -->|No| G[Sort by score]
-    G --> H[Output: Top K<br/>Recommendations]
-  (Screenshot of chart in the folder.)
-
-Potential Biases: Might be weighted moreso on genre.
-
-Screenshots of Terminal Output for Initial Test:
-![alt text](image-2.png)
-![alt text](image-3.png)
-
-Screenshots of Terminal Output for Stress Tests:
-![alt text](image-4.png)
-![alt text](image-5.png)
-![alt text](image-6.png)
-![alt text](image-7.png)
-![alt text](image-8.png)
-![alt text](image-9.png)
-![alt text](image-10.png)
-
-
-
-You can include a simple diagram or bullet list if helpful.
-
----
-
-## Getting Started
-
-### Setup
-
-1. Create a virtual environment (optional but recommended):
-
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate      # Mac or Linux
-   .venv\Scripts\activate         # Windows
-
-2. Install dependencies
-
-```bash
+## Setup Instructions: Step-by-step directions to run your code.
+1. Install the required libraries labeled in requirements.txt using the following command:
 pip install -r requirements.txt
-```
+2. Open terminal and change directory to "Applied-AI-Final-Project"
+3. Run the code by using executing the following command in the console:
+python src/main.py
+4. Follow the instructions printed on the terminal to generate your user profile and specify how many songs you want recommended to you.
+5. Wait a couple of seconds, implementing RAG for the similar genre/mood matches increased the runtime of the program (accessing the APIs, parsing the JSON, etc.)
 
-3. Run the app:
+## Sample Interactions: Include at least 2-3 examples of inputs and the resulting AI outputs to demonstrate the system is functional.
 
-```bash
-python -m src.main
-```
 
-### Running Tests
+## Design Decisions: Why you built it this way, and what trade-offs you made.
 
-Run the starter tests with:
+## Testing Summary: What worked, what didn't, and what you learned.
 
-```bash
-pytest
-```
+## Reflection: What this project taught you about AI and problem-solving.
 
-You can add more tests in `tests/test_recommender.py`.
-
----
-
-## Experiments You Tried
-
-Use this section to document the experiments you ran. For example:
-
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
-
----
-
-## Limitations and Risks
-
-Summarize some limitations of your recommender.
-
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
-
----
-
-## Reflection
-
-Read and complete `model_card.md`:
-
-[**Model Card**](model_card.md)
-
-Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
-
-
----
-
-## 7. `model_card_template.md`
-
-Combines reflection and model card framing from the Module 3 guidance. :contentReference[oaicite:2]{index=2}  
-
-```markdown
-# 🎧 Model Card - Music Recommender Simulation
-
-## 1. Model Name
-
-Give your recommender a name, for example:
-
-> VibeFinder 1.0
-
----
-
-## 2. Intended Use
-
-- What is this system trying to do
-- Who is it for
-
-Example:
-
-> This model suggests 3 to 5 songs from a small catalog based on a user's preferred genre, mood, and energy level. It is for classroom exploration only, not for real users.
-
----
-
-## 3. How It Works (Short Explanation)
-
-Describe your scoring logic in plain language.
-
-- What features of each song does it consider
-- What information about the user does it use
-- How does it turn those into a number
-
-Try to avoid code in this section, treat it like an explanation to a non programmer.
-
----
-
-## 4. Data
-
-Describe your dataset.
-
-- How many songs are in `data/songs.csv`
-- Did you add or remove any songs
-- What kinds of genres or moods are represented
-- Whose taste does this data mostly reflect
-
----
-
-## 5. Strengths
-
-Where does your recommender work well
-
-You can think about:
-- Situations where the top results "felt right"
-- Particular user profiles it served well
-- Simplicity or transparency benefits
-
----
-
-## 6. Limitations and Bias
-
-Where does your recommender struggle
-
-Some prompts:
-- Does it ignore some genres or moods
-- Does it treat all users as if they have the same taste shape
-- Is it biased toward high energy or one genre by default
-- How could this be unfair if used in a real product
-
----
-
-## 7. Evaluation
-
-How did you check your system
-
-Examples:
-- You tried multiple user profiles and wrote down whether the results matched your expectations
-- You compared your simulation to what a real app like Spotify or YouTube tends to recommend
-- You wrote tests for your scoring logic
-
-You do not need a numeric metric, but if you used one, explain what it measures.
-
----
-
-## 8. Future Work
-
-If you had more time, how would you improve this recommender
-
-Examples:
-
-- Add support for multiple users and "group vibe" recommendations
-- Balance diversity of songs instead of always picking the closest match
-- Use more features, like tempo ranges or lyric themes
-
----
-
-## 9. Personal Reflection
-
-A few sentences about what you learned:
-
-- What surprised you about how your system behaved
-- How did building this change how you think about real music recommenders
-- Where do you think human judgment still matters, even if the model seems "smart"
-
+## Link to Loom Presentation:

@@ -1,0 +1,143 @@
+# Music Recommender System with RAG Integration - Complete Architecture
+
+```mermaid
+graph TD
+    %% User Interaction Layer
+    A[User] --> B[main.py - Interactive Input]
+    B --> C[Get User Preferences]
+    C --> D[Genre Input]
+    C --> E[Mood Input]
+    C --> F[Energy Level Input]
+    C --> G[Acoustic Preference Input]
+    C --> H[Number of Recommendations]
+
+    %% Data Loading Layer
+    I[load_songs("data/songs.csv")] --> J[CSV File Reader]
+    J --> K[Parse Song Data]
+    K --> L[Song Dictionary List]
+    L --> M[20 Songs Loaded]
+
+    %% Recommendation Engine
+    N[recommend_songs(user_prefs, songs, k)] --> O[Score All Songs]
+    O --> P[For Each Song: score_song()]
+
+    %% RAG-Enhanced Scoring System
+    P --> Q{RAG Scoring Logic}
+
+    %% Genre Matching with RAG
+    Q --> R[Genre Match Check]
+    R --> S{Exact Match?}
+    S -->|Yes| T[+2.0 points]
+    S -->|No| U[Check Thesaurus Similarity]
+    U --> V{Similar via RAG?}
+    V -->|Yes| W[+1.5 points]
+    V -->|No| X[+0.0 points]
+
+    %% Mood Matching with RAG
+    Q --> Y[Mood Match Check]
+    Y --> Z{Exact Match?}
+    Z -->|Yes| AA[+1.0 points]
+    Z -->|No| BB[Check Thesaurus Similarity]
+    BB --> CC{Similar via RAG?}
+    CC -->|Yes| DD[+0.8 points]
+    CC -->|No| EE[+0.0 points]
+
+    %% Other Scoring Factors
+    Q --> FF[Energy Match Scoring]
+    FF --> GG[1.0 - |target_energy - song_energy|]
+    Q --> HH[Acousticness Scoring]
+    HH --> II{User likes acoustic?}
+    II -->|Yes| JJ[+song_acousticness]
+    II -->|No| KK[+ (1.0 - song_acousticness)]
+
+    %% RAG System Details
+    U --> LL[RAG Thesaurus Lookup]
+    BB --> LL
+    LL --> MM{Datamuse API Available?}
+    MM -->|Yes| NN[Query Online API]
+    NN --> OO[Cache Results]
+    MM -->|No| PP[Use Local Thesaurus]
+    PP --> QQ[Curated Music Synonyms]
+    QQ --> RR[Cache Results]
+
+    OO --> SS[Return Synonyms]
+    RR --> SS
+
+    %% Output Processing
+    T --> TT[Calculate Total Score]
+    W --> TT
+    X --> TT
+    AA --> TT
+    DD --> TT
+    EE --> TT
+    GG --> TT
+    JJ --> TT
+    KK --> TT
+
+    TT --> UU[Generate Explanation]
+    UU --> VV[Sort by Score Descending]
+    VV --> WW[Take Top K Recommendations]
+
+    %% Final Output
+    WW --> XX[Display Recommendations]
+    XX --> YY[Song Title + Score]
+    XX --> ZZ[Detailed Reasoning]
+
+    %% Styling
+    classDef userInput fill:#e1f5fe
+    classDef dataLoad fill:#f3e5f5
+    classDef scoring fill:#e8f5e8
+    classDef ragSystem fill:#fff3e0
+    classDef output fill:#fce4ec
+
+    class A,B,C,D,E,F,G,H userInput
+    class I,J,K,L,M dataLoad
+    class N,O,P,Q,R,Y,FF,HH scoring
+    class LL,MM,NN,OO,PP,QQ,RR,SS ragSystem
+    class TT,UU,VV,WW,XX,YY,ZZ output
+```
+
+## Diagram Overview
+
+This diagram shows the complete architecture of the music recommender system with RAG (Retrieval-Augmented Generation) integration.
+
+### Key Components:
+
+1. **User Input Layer** (Light Blue)
+   - Interactive prompts for user preferences
+   - Genre, mood, energy level, acoustic preference, and number of recommendations
+
+2. **Data Loading Layer** (Light Purple)
+   - CSV file parsing
+   - Song data structure creation
+   - 20 songs loaded from dataset
+
+3. **Recommendation Engine** (Light Green)
+   - Scoring algorithm for all songs
+   - RAG-enhanced similarity matching
+
+4. **RAG System** (Light Orange)
+   - Online Datamuse API for synonyms
+   - Local curated thesaurus fallback
+   - Caching for performance
+
+5. **Output Layer** (Light Pink)
+   - Sorted recommendations
+   - Detailed scoring explanations
+
+### RAG Scoring Logic:
+
+- **Exact Genre Match**: +2.0 points
+- **Similar Genre (via RAG)**: +1.5 points
+- **Exact Mood Match**: +1.0 points
+- **Similar Mood (via RAG)**: +0.8 points
+- **Energy Match**: 1.0 - |target - song_energy|
+- **Acousticness**: Based on user preference
+
+### RAG System Features:
+
+- **Dual Source**: Online API + Local fallback
+- **Caching**: Avoids repeated API calls
+- **Rate Limiting**: Respects API limits
+- **Bidirectional**: Checks both directions for similarity
+- **Graceful Degradation**: Works offline
